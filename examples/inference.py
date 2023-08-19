@@ -1,4 +1,11 @@
 # Author: Frank Cwitkowitz <fcwitkow@ur.rochester.edu>
+from pathlib import Path
+import sys
+
+print(sys.path)
+path_root = Path(__file__).parents[1]
+sys.path.append(str(path_root))
+print(sys.path)
 
 # My imports
 from guitar_transcription_continuous.estimators import StackedPitchListTablatureWrapper
@@ -21,10 +28,12 @@ import torch
 import os
 
 
+
 matplotlib.use('TkAgg')
 
 # Define path to model and audio to transcribe
-model_path = os.path.join(tools.HOME, 'Downloads', 'FretNet', 'models', 'fold-0', 'model-2000.pt')
+# model_path = os.path.join(tools.HOME, 'Downloads', 'FretNet', 'models', 'fold-0', 'model-2000.pt')
+model_path = os.path.join(tools.HOME, 'Documents', 'ThesisWork', 'EvaluationOfResearchPapers', 'FretNet', 'generated', 'experiments', 'FretNet_GuitarSetPlus_HCQT_X', 'models', 'fold-5', 'model-2000.pt') 
 audio_path = os.path.join(tools.HOME, 'Desktop', 'Datasets', 'GuitarSet', 'audio_mono-mic', '00_Jazz2-187-F#_solo_mic.wav')
 
 # Number of samples per second of audio

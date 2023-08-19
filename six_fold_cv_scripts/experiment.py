@@ -1,4 +1,11 @@
 # Author: Frank Cwitkowitz <fcwitkow@ur.rochester.edu>
+from pathlib import Path
+import sys
+
+print(sys.path)
+path_root = Path(__file__).parents[1]
+sys.path.append(str(path_root))
+print(sys.path)
 
 # My imports
 from guitar_transcription_continuous.models import TabCNN, TabCNNLogisticContinuous, FretNet

@@ -1,4 +1,11 @@
 # Author: Frank Cwitkowitz <fcwitkow@ur.rochester.edu>
+from pathlib import Path
+import sys
+
+print(sys.path)
+path_root = Path(__file__).parents[1]
+sys.path.append(str(path_root))
+print(sys.path)
 
 # My imports
 from guitar_transcription_continuous.datasets import GuitarSetPlus as GuitarSet
@@ -31,8 +38,8 @@ import json
 import os
 
 # Construct the path to the top-level directory of the experiment
-experiment_dir = os.path.join(tools.HOME, 'Desktop', 'guitar-transcription-continuous',
-                              'generated', 'experiments', 'FretNet_GuitarSetPlus_HCQT_X')
+experiment_dir = os.path.join(tools.HOME, 'Documents', 'ThesisWork', 'EvaluationOfResearchPapers', 'FretNet', 
+        'generated', 'experiments', 'FretNet_GuitarSetPlus_HCQT_X')
 
 # Define the model checkpoints to use for six-fold cross-validation
 checkpoints = [-1, -1, -1, -1, -1, -1]
