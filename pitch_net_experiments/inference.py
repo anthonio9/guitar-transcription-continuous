@@ -1,14 +1,9 @@
 # Author: Frank Cwitkowitz <fcwitkow@ur.rochester.edu>
-from pathlib import Path
-import sys
-
-print(sys.path)
-path_root = Path(__file__).parents[1]
-sys.path.append(str(path_root))
-print(sys.path)
 
 # My imports
-from guitar_transcription_continuous.estimators import StackedPitchListTablatureWrapper
+import getconfig
+from guitar_transcription_continuous.estimators \
+        import StackedPitchListTablatureWrapper
 from amt_tools.features import HCQT
 
 from amt_tools.transcribe import ComboEstimator, \
@@ -19,7 +14,6 @@ from amt_tools.inference import run_offline
 
 import guitar_transcription_continuous.utils as utils
 import amt_tools.tools as tools
-import getconfig
 
 # Regular imports
 import matplotlib.pyplot as plt
@@ -29,14 +23,18 @@ import torch
 import os
 
 
-
 matplotlib.use('TkAgg')
 
 # Define path to model and audio to transcribe
-# model_path = os.path.join(tools.HOME, 'Documents', 'ThesisWork', 'EvaluationOfResearchPapers', 'FretNet', 'generated', 'experiments', 'FretNet_GuitarSetPlus_HCQT_X', 'models', 'fold-5', 'model-2000.pt') 
-# audio_path = os.path.join(tools.HOME, 'Desktop', 'Datasets', 'GuitarSet', 'audio_mono-mic', '00_Jazz2-187-F#_solo_mic.wav')
-model_path = os.path.join(getconfig.get_models_path(), 'fold-5', 'model-2000.pt')
-audio_path = os.path.join(getconfig.get_datasets_path(), 'GuitarSet', 'audio_mono-mic', '00_Jazz2-187-F#_solo_mic.wav')
+model_path = os.path.join(tools.HOME,
+                          getconfig.get_models_path(),
+                          'fold-5',
+                          'model-2000.pt')
+audio_path = os.path.join(tools.HOME,
+                          getconfig.get_datasets_path(),
+                          'GuitarSet',
+                          'audio_mono-mic',
+                          '00_Jazz2-187-F#_solo_mic.wav')
 
 # Number of samples per second of audio
 sample_rate = 22050
@@ -75,8 +73,8 @@ data_proc = HCQT(sample_rate=sample_rate,
                  n_bins=144, bins_per_octave=36)
 
 # Compute the features
-features = {tools.KEY_FEATS : data_proc.process_audio(audio),
-            tools.KEY_TIMES : data_proc.get_times(audio)}
+features = {tools.KEY_FEATS: data_proc.process_audio(audio),
+            tools.KEY_TIMES: data_proc.get_times(audio)}
 
 # Initialize the estimation pipeline
 estimator = ComboEstimator([
