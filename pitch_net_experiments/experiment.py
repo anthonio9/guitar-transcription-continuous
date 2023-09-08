@@ -1,6 +1,7 @@
 # Author: Frank Cwitkowitz <fcwitkow@ur.rochester.edu>
 
 # My imports
+import getconfig
 from guitar_transcription_continuous.models \
         import TabCNN, TabCNNLogisticContinuous, FretNet
 from guitar_transcription_continuous.datasets import GuitarSetPlus as GuitarSet
