@@ -1,16 +1,11 @@
 # Author: Frank Cwitkowitz <fcwitkow@ur.rochester.edu>
-from pathlib import Path
-import sys
-
-print(sys.path)
-path_root = Path(__file__).parents[1]
-sys.path.append(str(path_root))
-print(sys.path)
 
 # My imports
-from guitar_transcription_continuous.models import TabCNN, TabCNNLogisticContinuous, FretNet
+from guitar_transcription_continuous.models \
+        import TabCNN, TabCNNLogisticContinuous, FretNet
 from guitar_transcription_continuous.datasets import GuitarSetPlus as GuitarSet
-from guitar_transcription_continuous.estimators import StackedPitchListTablatureWrapper
+from guitar_transcription_continuous.estimators \
+        import StackedPitchListTablatureWrapper
 from guitar_transcription_continuous.evaluators import *
 from amt_tools.features import CQT, HCQT
 
