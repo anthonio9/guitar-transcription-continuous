@@ -245,17 +245,11 @@ def fretnet_cross_val(sample_rate, hop_length, num_frames, iterations, checkpoin
             # Allocate training/testing splits
             train_splits = GuitarSet.available_splits()
 
-            if cross_folds > 1:
-                test_splits = [train_splits.pop(k)]
-            else:
-                test_splits = train_splits[:-2]
+            test_splits = [train_splits.pop(k)]
 
             if validation_split:
                 # Allocate validation split
-                if cross_folds > 1:
-                    val_splits = [train_splits.pop(k - 1)]
-                else:
-                    val_splits = train_splits[-2:]
+                val_splits = [train_splits.pop(k - 1)]
 
             if not augment_data:
                 print('Loading training partition...')
