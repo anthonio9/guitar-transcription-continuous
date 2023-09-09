@@ -333,7 +333,8 @@ def fretnet_cross_val(sample_rate, hop_length, num_frames, iterations, checkpoin
                               gamma=gamma,
                               cont_layer=cont_layer,
                               estimate_onsets=estimate_onsets,
-                              device=gpu_id)
+                              device=gpu_id,
+                              frames=18)
             fretnet.change_device()
             fretnet.train()
 
