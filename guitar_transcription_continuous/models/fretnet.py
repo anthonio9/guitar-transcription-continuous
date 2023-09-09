@@ -60,7 +60,7 @@ class FretNet(TabCNNLogisticContinuous):
         ks3 = ks2
 
         # Padding amount for each convolutional block
-        pd1 = (1, 1)
+        pd1 = (1, 0)
         pd2 = (1, 0)
         pd3 = pd2
 
