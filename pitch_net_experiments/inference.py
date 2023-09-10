@@ -22,16 +22,16 @@ import librosa
 import torch
 import os
 
+SINGLE = 'FretNet_GuitarSetPlus_HCQT_SINGLE'
+SIX = 'FretNet_GuitarSetPlus_HCQT_X'
+model_type = SINGLE
+
 
 matplotlib.use('TkAgg')
 
 # Define path to model and audio to transcribe
-model_path = os.path.join(tools.HOME,
-                          getconfig.get_models_path(),
-                          'fold-5',
-                          'model-2000.pt')
-audio_path = os.path.join(tools.HOME,
-                          getconfig.get_datasets_path(),
+model_path = os.path.join(str(getconfig.git_root_path), '..', 'generated', 'experiments', model_type, 'models', 'fold-0', 'model-2000.pt')
+audio_path = os.path.join(str(getconfig.git_root_path), '..', 'Datasets',
                           'GuitarSet',
                           'audio_mono-mic',
                           '00_Jazz2-187-F#_solo_mic.wav')

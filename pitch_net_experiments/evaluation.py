@@ -31,9 +31,11 @@ import torch
 import json
 import os
 
+EX_NAME = '_'.join(['FretNet',
+                    GuitarSet.dataset_name(),
+                    HCQT.features_name(), 'SINGLE'])
 # Construct the path to the top-level directory of the experiment
-experiment_dir = os.path.join(tools.HOME, 'Documents', 'ThesisWork', 'EvaluationOfResearchPapers', 'FretNet', 
-        'generated', 'experiments', 'FretNet_GuitarSetPlus_HCQT_X')
+experiment_dir = os.path.join(str(getconfig.git_root_path), '..', 'generated', 'experiments', EX_NAME)
 
 # Define the model checkpoints to use for six-fold cross-validation
 checkpoints = [-1, -1, -1, -1, -1, -1]
@@ -162,11 +164,14 @@ for k in range(6):
     # Allocate the testing split for the fold
     test_splits = [GuitarSet.available_splits().pop(k)]
 
+    # Build the path to GuitarSet
+    gset_base_dir = os.path.join(str(getconfig.git_root_path), '..', 'Datasets', 'GuitarSet')
+
     # Define expected path for calculated features and ground-truth
     gset_cache = os.path.join('..', 'generated', 'data', 'val')
 
     # Create a dataset corresponding to the testing partition
-    gset_test = GuitarSet(base_dir=None,
+    gset_test = GuitarSet(base_dir=gset_base_dir,
                           splits=test_splits,
                           hop_length=hop_length,
                           sample_rate=sample_rate,

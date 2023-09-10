@@ -205,14 +205,14 @@ class FretNet(TabCNNLogisticContinuous):
 
         # Obtain the feature embeddings from the model
         embeddings = self.conv1(feats)
-        print(f"conv1 shape: {embeddings.shape}")
+        # print(f"conv1 shape: {embeddings.shape}")
 
         embeddings = self.conv2(embeddings)
-        print(f"conv2 shape: {embeddings.shape}")
+        # print(f"conv2 shape: {embeddings.shape}")
 
         embeddings = self.pool2(embeddings)
         embeddings = self.conv3(embeddings)
-        print(f"conv3 shape: {embeddings.shape}")
+        # print(f"conv3 shape: {embeddings.shape}")
 
         embeddings = self.pool3(embeddings)
 
