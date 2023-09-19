@@ -105,7 +105,7 @@ stacked_pitch_list = tools.stacked_pitch_list_to_hz(
         predictions[tools.KEY_PITCHLIST])
 
 # Plot estimated tablature and add an appropriate title
-fig_est = tools.initialize_figure(interactive=False, figsize=(20, 5))
+# fig_est = tools.initialize_figure(interactive=False, figsize=(20, 5))
 # fig_est = tools.plot_guitar_tablature(stacked_frets_est, fig=fig_est)
 fig_est = tools.plot_stacked_pitch_list(stacked_pitch_list=stacked_pitch_list,
                                         hertz=True)
