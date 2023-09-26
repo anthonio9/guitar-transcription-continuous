@@ -111,8 +111,12 @@ stacked_pitch_list = tools.stacked_pitch_list_to_hz(
 # fig_est = tools.plot_stacked_pitch_list(stacked_pitch_list=stacked_pitch_list,
 #                                         hertz=True)
 fig_est = visualize.plot_stacked_pitch_list_with_spectrogram(
-        audio_features=features[tools.KEY_FEATS],
-        stacked_pitch_list=stacked_pitch_list, hertz=True)
+        audio=audio,
+        features=features,
+        sample_rate=sample_rate,
+        hop_length=hop_length,
+        stacked_pitch_list=stacked_pitch_list, 
+        hertz=True)
 fig_est.suptitle('Inference')
 
 # Display the plot
