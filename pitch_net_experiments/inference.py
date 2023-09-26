@@ -21,6 +21,7 @@ import matplotlib
 import librosa
 import torch
 import os
+import visualize
 
 SINGLE = 'FretNet_GuitarSetPlus_HCQT_SINGLE'
 SIX = 'FretNet_GuitarSetPlus_HCQT_X'
@@ -107,8 +108,11 @@ stacked_pitch_list = tools.stacked_pitch_list_to_hz(
 # Plot estimated tablature and add an appropriate title
 # fig_est = tools.initialize_figure(interactive=False, figsize=(20, 5))
 # fig_est = tools.plot_guitar_tablature(stacked_frets_est, fig=fig_est)
-fig_est = tools.plot_stacked_pitch_list(stacked_pitch_list=stacked_pitch_list,
-                                        hertz=True)
+# fig_est = tools.plot_stacked_pitch_list(stacked_pitch_list=stacked_pitch_list,
+#                                         hertz=True)
+fig_est = visualize.plot_stacked_pitch_list_with_spectrogram(
+        audio_features=features[tools.KEY_FEATS],
+        stacked_pitch_list=stacked_pitch_list, hertz=True)
 fig_est.suptitle('Inference')
 
 # Display the plot
