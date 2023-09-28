@@ -2,6 +2,7 @@ import configparser
 import json
 import os
 import sys
+from pathlib import Path
 from subprocess import call, check_output, STDOUT
 
 
@@ -15,6 +16,11 @@ def get_git_root():
         return None
     else:
         root = check_output(["git", "rev-parse", "--show-toplevel"]).decode()
+
+        # get rid of break `\n` symbol at the end of the path
+        if root[-1:] == "\n":
+            root = root[:-1]
+        root = Path(root)
         return root
 
 

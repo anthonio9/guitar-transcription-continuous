@@ -1,6 +1,7 @@
 # Author: Frank Cwitkowitz <fcwitkow@ur.rochester.edu>
 
 # My imports
+import getconfig
 from guitar_transcription_continuous.models \
         import TabCNN, TabCNNLogisticContinuous, FretNet
 from guitar_transcription_continuous.datasets import GuitarSetPlus as GuitarSet
@@ -40,9 +41,9 @@ torch.multiprocessing.set_start_method('spawn', force=True)
 
 EX_NAME = '_'.join([FretNet.model_name(),
                     GuitarSet.dataset_name(),
-                    HCQT.features_name(), 'X'])
+                    HCQT.features_name(), 'SINGLE'])
 
-ex = Experiment('FretNet w/ HCQT on GuitarSet w/ 6-fold Cross Validation')
+ex = Experiment('FretNet w/ HCQT on GuitarSet w/ no cross-validation')
 
 
 @ex.config
@@ -77,6 +78,9 @@ def config():
 
     # Flag to set aside one split for validation
     validation_split = True
+
+    # Cross-validation (6) or no cross-validation (1)
+    cross_folds = 1
 
     # Whether to perform data augmentation (pitch shifting) during training
     augment_data = False
@@ -120,16 +124,8 @@ def config():
     # The random seed for this experiment
     seed = 0
 
-    # Switch to manage different file schema (0 - local | 1 - lab machine | 2 - valohai)
-    file_layout = 0
-
     # Create the root directory for the experiment files
-    if file_layout == 2:
-        root_dir = os.path.join(os.getenv('VH_OUTPUTS_DIR'), EX_NAME)
-    elif file_layout == 1:
-        root_dir = os.path.join('/', 'storage', 'frank', 'continuous_experiments', EX_NAME)
-    else:
-        root_dir = os.path.join('..', 'generated', 'experiments', EX_NAME)
+    root_dir = os.path.join(str(getconfig.git_root_path), '..', 'generated', 'experiments', EX_NAME)
     os.makedirs(root_dir, exist_ok=True)
 
     # Add a file storage observer for the log directory
@@ -138,9 +134,9 @@ def config():
 
 @ex.automain
 def fretnet_cross_val(sample_rate, hop_length, num_frames, iterations, checkpoints, batch_size, learning_rate, gpu_id,
-                      reset_data, validation_split, augment_data, semitone_radius, rotarize_deviations, cont_layer,
-                      lmbda, matrix_path, silence_activations, use_cluster_grouping, use_adjusted_targets, gamma,
-                      estimate_onsets, harmonic_dimension, seed, file_layout, root_dir):
+                      reset_data, validation_split, cross_folds, augment_data, semitone_radius, rotarize_deviations, 
+                      cont_layer, lmbda, matrix_path, silence_activations, use_cluster_grouping, use_adjusted_targets, 
+                      gamma, estimate_onsets, harmonic_dimension, seed, root_dir):
     # Initialize the default guitar profile
     profile = tools.GuitarProfile(num_frets=19)
 
@@ -207,20 +203,10 @@ def fretnet_cross_val(sample_rate, hop_length, num_frames, iterations, checkpoin
                                            PitchListEvaluator(pitch_tolerances=tols)])
 
     # Build the path to GuitarSet
-    if file_layout == 2:
-        gset_base_dir = os.path.join(os.getenv('VH_INPUTS_DIR'),
-                                     'data', 'frank-internship',
-                                     'active', 'GuitarSet')
-    elif file_layout == 1:
-        gset_base_dir = os.path.join('/', 'storage', 'frank', 'GuitarSet')
-    else:
-        gset_base_dir = None
+    gset_base_dir = os.path.join(str(getconfig.git_root_path), '..', 'Datasets', 'GuitarSet')
 
     # Keep all cached data/features here
-    if file_layout == 1:
-        gset_cache = os.path.join('/', 'storageNVME', 'frank')
-    else:
-        gset_cache = os.path.join('..', 'generated', 'data')
+    gset_cache = os.path.join(str(getconfig.git_root_path), '..', 'generated', 'data')
     gset_cache_train = os.path.join(gset_cache, 'train') # No extras
     gset_cache_val = os.path.join(gset_cache, 'val') # Includes extras
 
@@ -229,7 +215,7 @@ def fretnet_cross_val(sample_rate, hop_length, num_frames, iterations, checkpoin
         results = dict()
 
         # Perform six-fold cross-validation
-        for k in range(6):
+        for k in range(cross_folds):
             print('--------------------')
             print(f'Fold {k}:')
 
@@ -241,6 +227,7 @@ def fretnet_cross_val(sample_rate, hop_length, num_frames, iterations, checkpoin
 
             # Allocate training/testing splits
             train_splits = GuitarSet.available_splits()
+
             test_splits = [train_splits.pop(k)]
 
             if validation_split:
@@ -328,7 +315,8 @@ def fretnet_cross_val(sample_rate, hop_length, num_frames, iterations, checkpoin
                               gamma=gamma,
                               cont_layer=cont_layer,
                               estimate_onsets=estimate_onsets,
-                              device=gpu_id)
+                              device=gpu_id,
+                              frames=18)
             fretnet.change_device()
             fretnet.train()
 

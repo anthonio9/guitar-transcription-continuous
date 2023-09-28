@@ -23,7 +23,7 @@ class FretNet(TabCNNLogisticContinuous):
 
     def __init__(self, dim_in, profile, in_channels, model_complexity=1, semitone_radius=0.5,
                  gamma=1, cont_layer=1, matrix_path=None, silence_activations=False, lmbda=1,
-                 estimate_onsets=True, device='cpu'):
+                 estimate_onsets=True, device='cpu', frames=9):
         """
         Initialize all components of the model.
 
@@ -38,7 +38,8 @@ class FretNet(TabCNNLogisticContinuous):
           Switch for including an additional head to estimate onsets
         """
 
-        TranscriptionModel.__init__(self, dim_in, profile, in_channels, model_complexity, 9, device)
+        TranscriptionModel.__init__(self, dim_in, profile, in_channels,
+                                    model_complexity, frames, device)
 
         self.semitone_radius = semitone_radius
         self.gamma = gamma
@@ -54,8 +55,8 @@ class FretNet(TabCNNLogisticContinuous):
         nf3 = 48 * model_complexity
 
         # Kernel size for each convolutional block
-        ks1 = (3, 3)
-        ks2 = ks1
+        ks1 = (3, 4)
+        ks2 = (3, 3)
         ks3 = ks2
 
         # Padding amount for each convolutional block
@@ -72,17 +73,21 @@ class FretNet(TabCNNLogisticContinuous):
         dp3 = 0.25
         dpx = 0.10
 
+        # Dilation
+        dl1 = (1, 3)
+        dl2 = (1, 1)
+
         self.conv1 = nn.Sequential(
-            nn.Conv2d(self.in_channels, nf1, ks1, padding=pd1),
+            nn.Conv2d(self.in_channels, nf1, ks1, padding=pd1, dilation=dl1),
             nn.BatchNorm2d(nf1),
             nn.ReLU(),
-            nn.Conv2d(nf1, nf1, ks1, padding=pd1),
+            nn.Conv2d(nf1, nf1, ks2, padding=pd2, dilation=dl2),
             nn.BatchNorm2d(nf1),
             nn.ReLU(),
         )
 
         self.conv2 = nn.Sequential(
-            nn.Conv2d(nf1, nf2, ks2, padding=pd2),
+            nn.Conv2d(nf1, nf2, ks2, padding=pd2, dilation=dl2),
             nn.BatchNorm2d(nf2),
             nn.ReLU(),
             nn.Conv2d(nf2, nf2, ks2, padding=pd2),
@@ -199,7 +204,17 @@ class FretNet(TabCNNLogisticContinuous):
         feats = feats.reshape(-1, self.in_channels, self.dim_in, self.frame_width)
 
         # Obtain the feature embeddings from the model
-        embeddings = self.pool3(self.conv3(self.pool2(self.conv2(self.conv1(feats)))))
+        embeddings = self.conv1(feats)
+        # print(f"conv1 shape: {embeddings.shape}")
+
+        embeddings = self.conv2(embeddings)
+        # print(f"conv2 shape: {embeddings.shape}")
+
+        embeddings = self.pool2(embeddings)
+        embeddings = self.conv3(embeddings)
+        # print(f"conv3 shape: {embeddings.shape}")
+
+        embeddings = self.pool3(embeddings)
 
         # Flatten spatial features into one embedding
         embeddings = embeddings.flatten(1)

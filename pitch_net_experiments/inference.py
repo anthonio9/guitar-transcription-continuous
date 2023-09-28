@@ -1,6 +1,7 @@
 # Author: Frank Cwitkowitz <fcwitkow@ur.rochester.edu>
 
 # My imports
+import getconfig
 from guitar_transcription_continuous.estimators \
         import StackedPitchListTablatureWrapper
 from amt_tools.features import HCQT
@@ -13,7 +14,6 @@ from amt_tools.inference import run_offline
 
 import guitar_transcription_continuous.utils as utils
 import amt_tools.tools as tools
-import getconfig
 
 # Regular imports
 import matplotlib.pyplot as plt
@@ -21,17 +21,17 @@ import matplotlib
 import librosa
 import torch
 import os
+import visualize
 
+SINGLE = 'FretNet_GuitarSetPlus_HCQT_SINGLE'
+SIX = 'FretNet_GuitarSetPlus_HCQT_X'
+model_type = SINGLE
 
 matplotlib.use('TkAgg')
 
 # Define path to model and audio to transcribe
-model_path = os.path.join(tools.HOME,
-                          getconfig.get_models_path(),
-                          'fold-5',
-                          'model-2000.pt')
-audio_path = os.path.join(tools.HOME,
-                          getconfig.get_datasets_path(),
+model_path = os.path.join(str(getconfig.git_root_path), '..', 'generated', 'experiments', model_type, 'models', 'fold-0', 'model-2000.pt')
+audio_path = os.path.join(str(getconfig.git_root_path), '..', 'Datasets',
                           'GuitarSet',
                           'audio_mono-mic',
                           '00_Jazz2-187-F#_solo_mic.wav')
@@ -101,10 +101,21 @@ stacked_notes_est = predictions[tools.KEY_NOTES]
 
 # Convert the estimated notes to frets
 stacked_frets_est = tools.stacked_notes_to_frets(stacked_notes_est)
+stacked_pitch_list = tools.stacked_pitch_list_to_hz(
+        predictions[tools.KEY_PITCHLIST])
 
 # Plot estimated tablature and add an appropriate title
-fig_est = tools.initialize_figure(interactive=False, figsize=(20, 5))
-fig_est = tools.plot_guitar_tablature(stacked_frets_est, fig=fig_est)
+# fig_est = tools.initialize_figure(interactive=False, figsize=(20, 5))
+# fig_est = tools.plot_guitar_tablature(stacked_frets_est, fig=fig_est)
+# fig_est = tools.plot_stacked_pitch_list(stacked_pitch_list=stacked_pitch_list,
+#                                         hertz=True)
+fig_est = visualize.plot_stacked_pitch_list_with_spectrogram(
+        audio=audio,
+        features=features,
+        sample_rate=sample_rate,
+        hop_length=hop_length,
+        stacked_pitch_list=stacked_pitch_list, 
+        hertz=True)
 fig_est.suptitle('Inference')
 
 # Display the plot
