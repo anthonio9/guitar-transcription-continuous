@@ -49,9 +49,3 @@ if git_root_path is not None:
 # parse paths from the config file
 config = configparser.ConfigParser()
 config.read('config.ini')
-
-#print(sys.path)
-#path_root = Path(__file__).parents[1]
-#sys.path.append(str(path_root))
-#print(sys.path)
-

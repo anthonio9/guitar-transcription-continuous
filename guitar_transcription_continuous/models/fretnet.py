@@ -223,6 +223,8 @@ class FretNet(TabCNNLogisticContinuous):
         # Restore proper batch dimension, unsqueezing sequence-frame axis
         embeddings = embeddings.view(batch_size, -1, embedding_size)
 
+        breakpoint()
+
         # Process embeddings with discrete tablature head
         output[tools.KEY_TABLATURE] = self.tablature_head(embeddings).pop(tools.KEY_TABLATURE)
 
