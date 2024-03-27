@@ -100,6 +100,28 @@ class PitchListEvaluator(_PitchListEvaluator):
         return pitch_list_est, pitch_list_ref
 
 
+class SimpleMultiPitchRMSEEvaluator(PitchListEvaluator):
+    """
+    Simple evaluator telling the accuracy of predictions according
+    to the rule where each row of ground truth is checked for presence
+    in the predicted values.
+    """
+
+    def evaluate(self, estimated, reference):
+        pass
+
+
+class SimpleMultiPitchRPAEvaluator(PitchListEvaluator):
+    """
+    Simple evaluator telling the accuracy of predictions according
+    to the rule where each row of ground truth is checked for presence
+    in the predicted values.
+    """
+
+    def evaluate(self, estimated, reference):
+        pass
+
+
 class NoteEvaluator(_NoteEvaluator):
     """
     Simple wrapper to support stacked note estimates and ground-truth.
