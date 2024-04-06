@@ -19,11 +19,30 @@ pip install -e guitar-transcription-continuous/
 ```
 
 ## Usage
-#### TODO
-TODO
 
 #### Six-Fold Cross-Validation on GuitarSet
 The scripts ```experiment.py``` and ```evaluation.py``` under ```six_fold_cv_scripts``` are available as a more complete example of how to train and evaluate the proposed model under the six-fold cross-validation schema using [amt-tools](https://github.com/cwitkowitz/amt-tools).
+
+#### Experiment
+
+To run the experiment, download the GuitarSet data set to `../Datasets` where current directory is the `guitar_transcription_continuous` root dir.
+Note that inside `guitar_transcription_continuous` there's another directory with the same name, do not enter it!
+
+```sh
+# enter guitar_transcription_continuous root dir
+cd guitar_transcription_continuous
+python six_fold_cv_scripts/experiment.py
+```
+
+#### Evaluation
+
+The experiment script sources data from the very same `../Datasets` location. 
+
+```sh
+cd guitar_transcription_continuous
+python six_fold_cv_scripts/evaluation.py
+```
+
 
 ## Generated Files
 Execution of ```six_fold_cv_scripts/experiment.py``` will generate the following under ```<root_dir>``` (defined at the top of the script):

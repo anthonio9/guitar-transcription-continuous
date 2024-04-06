@@ -212,7 +212,7 @@ def fretnet_cross_val(sample_rate, hop_length, num_frames, iterations, checkpoin
     elif file_layout == 1:
         gset_base_dir = os.path.join('/', 'storage', 'frank', 'GuitarSet')
     else:
-        gset_base_dir = None
+        gset_base_dir = os.path.join('..', 'Datasets', 'GuitarSet')
 
     # Keep all cached data/features here
     if file_layout == 1:

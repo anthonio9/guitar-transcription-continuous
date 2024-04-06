@@ -31,8 +31,10 @@ import json
 import os
 
 # Construct the path to the top-level directory of the experiment
-experiment_dir = os.path.join(tools.HOME, 'Desktop', 'guitar-transcription-continuous',
-                              'generated', 'experiments', 'FretNet_GuitarSetPlus_HCQT_X')
+experiment_dir = os.path.join('..', 
+                              'generated', 
+                              'experiments', 
+                              'FretNet_GuitarSetPlus_HCQT_X')
 
 # Define the model checkpoints to use for six-fold cross-validation
 checkpoints = [-1, -1, -1, -1, -1, -1]
@@ -154,6 +156,8 @@ for k in range(6):
                                                                   results_key=f'string-{tools.KEY_NOTE_OFF}'),
                                            # Continuous Pitch
                                            PitchListEvaluator(pitch_tolerances=tols),
+                                           SimpleMultiPitchRMSEEvaluator(),
+                                           SimpleMultiPitchRPAEvaluator(),
                                            # String-Level Continuous Pitch )
                                            TablaturePitchListEvaluator(pitch_tolerances=tols,
                                                                        results_key=f'string-{tools.KEY_PITCHLIST}')])
@@ -164,8 +168,10 @@ for k in range(6):
     # Define expected path for calculated features and ground-truth
     gset_cache = os.path.join('..', 'generated', 'data', 'val')
 
+    gset_base_dir = os.path.join('..', 'Datasets', 'GuitarSet')
+
     # Create a dataset corresponding to the testing partition
-    gset_test = GuitarSet(base_dir=None,
+    gset_test = GuitarSet(base_dir=gset_base_dir,
                           splits=test_splits,
                           hop_length=hop_length,
                           sample_rate=sample_rate,

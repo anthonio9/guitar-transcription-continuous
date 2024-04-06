@@ -13,9 +13,11 @@ import numpy as np
 __all__ = [
     'MultipitchEvaluator',
     'PitchListEvaluator',
+    'SimpleMultiPitchRMSEEvaluator',
+    'SimpleMultiPitchRPAEvaluator',
     'NoteEvaluator',
     'OnsetsEvaluator',
-    'OffsetsEvaluator'
+    'OffsetsEvaluator',
 ]
 
 
@@ -89,7 +91,6 @@ class PitchListEvaluator(_PitchListEvaluator):
             Time in seconds associated with each frame
           (T2 - number of observations in ground-truth (frames))
         """
-
         # Call the parent function to unpack the stacked data
         stacked_pitch_list_est, stacked_pitch_list_ref = super().unpack(estimated, reference)
 
