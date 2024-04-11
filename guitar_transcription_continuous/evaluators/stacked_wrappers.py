@@ -109,7 +109,36 @@ class SimpleMultiPitchRMSEEvaluator(PitchListEvaluator):
     """
 
     def evaluate(self, estimated, reference):
-        pass
+        # return only the reference times that exist in 
+        est_times = estimated[0]
+        est_pitch_list = estimated[1]
+
+        ref_times = reference[0]
+        ref_pitch_list = reference[1]
+
+        # return indexes of reference for timestamps that exist in estimated
+        ref_mask = np.isin(ref_times.round(decimals=4), est_times.round(decimals=4))
+
+        # iterate over the mask to get common pitch values
+        ref_pitch_list2 = [ref_pitch_list[ind] for (ind, ), mask in np.ndenumerate(ref_mask) if mask]
+
+        # get voiced estimated and reference based on voiced reference
+        ref_mask_voiced = np.array([bool(len(pitch_list)) for pitch_list in ref_pitch_list2])
+
+        # estimated pitch list voiced according to reference
+        est_pitch_list_voiced = [est_pitch_list[ind] for (ind, ), mask in np.ndenumerate(ref_mask_voiced) if mask]
+
+        # reference pitch list voiced
+        ref_pitch_list_voiced = [ref_pitch_list2[ind] for (ind, ), mask in np.ndenumerate(ref_mask_voiced) if mask]
+
+        for est, ref in zip(est_pitch_list_voiced, ref_pitch_list_voiced):
+            # convert Hz values to cents
+
+            # set the threshold value to 50 cents
+
+            # calculate the percent of values that drop below the threshold
+            pass
+        breakpoint()
 
 
 class SimpleMultiPitchRPAEvaluator(PitchListEvaluator):
