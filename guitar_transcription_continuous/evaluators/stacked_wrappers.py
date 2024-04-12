@@ -107,6 +107,26 @@ class SimpleMultiPitchRMSEEvaluator(PitchListEvaluator):
     to the rule where each row of ground truth is checked for presence
     in the predicted values.
     """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.OCTAVE = 1200
+        self.FMIN = 31
+        self.THRESHOLD = 50
+
+    def frequency_to_cents(frequency):
+        """Convert frequency in Hz to cents"""
+        if type(frequency) is np.ndarray:
+            return self.OCTAVE * np.log2(frequency / self.FMIN)
+        else:
+            return self.OCTAVE * torch.log2(frequency / self.FMIN)
+
+    def cents_diff(a, b):
+        """Compute pitch difference in cents"""
+        if type(a) is np.ndarray:
+            return self.OCTAVE * np.log2(a / b)
+        else:
+            return self.OCTAVE * torch.log2(a / b)
 
     def evaluate(self, estimated, reference):
         # return only the reference times that exist in 
@@ -133,10 +153,11 @@ class SimpleMultiPitchRMSEEvaluator(PitchListEvaluator):
 
         for est, ref in zip(est_pitch_list_voiced, ref_pitch_list_voiced):
             # convert Hz values to cents
-
-            # set the threshold value to 50 cents
+            est_cents = frequency_to_cents(est)
+            ref_cents = frequency_to_cents(ref)
 
             # calculate the percent of values that drop below the threshold
+            diff = cents_diff(est_cents, ref_cents)
             pass
         breakpoint()
 
