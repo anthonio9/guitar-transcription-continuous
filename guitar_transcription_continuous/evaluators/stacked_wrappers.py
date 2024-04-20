@@ -113,20 +113,48 @@ class SimpleMultiPitchRMSEEvaluator(PitchListEvaluator):
         self.OCTAVE = 1200
         self.FMIN = 31
         self.THRESHOLD = 50
+        self.count = 0
+        self.total = 0
 
-    def frequency_to_cents(frequency):
+    def frequency_to_cents(self, frequency):
         """Convert frequency in Hz to cents"""
         if type(frequency) is np.ndarray:
             return self.OCTAVE * np.log2(frequency / self.FMIN)
         else:
             return self.OCTAVE * torch.log2(frequency / self.FMIN)
 
-    def cents_diff(a, b):
+    def cents_diff(self, a, b):
         """Compute pitch difference in cents"""
         if type(a) is np.ndarray:
             return self.OCTAVE * np.log2(a / b)
         else:
             return self.OCTAVE * torch.log2(a / b)
+
+    def reset_results(self):
+        """
+        Reset tracked results to empty dictionary.
+        """
+
+        super().reset_results()
+
+        self.count = 0
+        self.total = 0
+
+    def average_results(self):
+        """
+        Return the average of the currently tracked results.
+
+        Returns
+        ----------
+        average : dictionary
+          Dictionary with a single value for each metric
+        """
+
+        # Average the tracked results
+        # average = average_results(self.results)
+        # return average
+        return math.sqrt((self.total / self.count).item())
+
 
     def evaluate(self, estimated, reference):
         # return only the reference times that exist in 
@@ -153,13 +181,24 @@ class SimpleMultiPitchRMSEEvaluator(PitchListEvaluator):
 
         for est, ref in zip(est_pitch_list_voiced, ref_pitch_list_voiced):
             # convert Hz values to cents
-            est_cents = frequency_to_cents(est)
-            ref_cents = frequency_to_cents(ref)
+            est_cents = self.frequency_to_cents(est)
+            ref_cents = self.frequency_to_cents(ref)
 
-            # calculate the percent of values that drop below the threshold
-            diff = cents_diff(est_cents, ref_cents)
-            pass
-        breakpoint()
+            # iterate over every string in the ground truth
+            for ref_string in ref_cents:
+
+                if len(est_cents) == 0:
+                    self.count += 1
+                    continue
+
+                # calculate the cents difference between one string ref and all strings estimated
+                difference = self.cents_diff(est_cents.reshape(-1, 1), ref_string.reshape(-1, 1))
+
+                # find one minimum in each timestamp - find the string with the note
+                difference_min = np.abs(difference).min()
+
+                self.count += 1
+                self.total += ((difference_min) ** 2).sum()
 
 
 class SimpleMultiPitchRPAEvaluator(PitchListEvaluator):
