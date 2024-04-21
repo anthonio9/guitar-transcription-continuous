@@ -115,6 +115,7 @@ class SimpleMultiPitchRMSEEvaluator(PitchListEvaluator):
         self.THRESHOLD = 50
         self.count = 0
         self.total = 0
+        self.results = {}
 
     def frequency_to_cents(self, frequency):
         """Convert frequency in Hz to cents"""
@@ -153,7 +154,7 @@ class SimpleMultiPitchRMSEEvaluator(PitchListEvaluator):
         # Average the tracked results
         # average = average_results(self.results)
         # return average
-        return math.sqrt((self.total / self.count).item())
+        return np.sqrt((self.total / self.count))
 
 
     def evaluate(self, estimated, reference):
@@ -179,6 +180,9 @@ class SimpleMultiPitchRMSEEvaluator(PitchListEvaluator):
         # reference pitch list voiced
         ref_pitch_list_voiced = [ref_pitch_list2[ind] for (ind, ), mask in np.ndenumerate(ref_mask_voiced) if mask]
 
+        count_tmp = 0
+        total_tmp = 0
+
         for est, ref in zip(est_pitch_list_voiced, ref_pitch_list_voiced):
             # convert Hz values to cents
             est_cents = self.frequency_to_cents(est)
@@ -197,8 +201,29 @@ class SimpleMultiPitchRMSEEvaluator(PitchListEvaluator):
                 # find one minimum in each timestamp - find the string with the note
                 difference_min = np.abs(difference).min()
 
-                self.count += 1
-                self.total += ((difference_min) ** 2).sum()
+                count_tmp += 1
+                total_tmp += ((difference_min) ** 2).sum()
+
+        self.count += count_tmp
+        self.total += total_tmp
+
+        results = dict()
+        results["rmse"] = np.sqrt((self.total / self.count))
+        # self.results[self.get_default_key()] 
+
+        # Average the tracked results
+        # average = average_results(self.results)
+        # return average
+        # return np.sqrt((total_tmp / count_tmp))
+        return results
+
+    # @staticmethod
+    # def get_default_key():
+    #     """
+    #     Provide the default key to use in the event no key was provided.
+    #     """
+    #
+    #     return "RMSE"
 
 
 class SimpleMultiPitchRPAEvaluator(PitchListEvaluator):
