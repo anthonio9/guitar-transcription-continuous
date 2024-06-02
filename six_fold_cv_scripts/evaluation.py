@@ -70,6 +70,9 @@ output_dir = sorted([dir for dir in os.listdir(experiment_dir) if dir.isdigit()]
 # Specify the path to an output file to log results
 output_path = os.path.join(experiment_dir, output_dir, f'six-fold-{identifier}.json')
 
+if not os.path.exists(os.path.join(experiment_dir, output_dir)):
+    os.makedirs(os.path.join(experiment_dir, output_dir))
+
 # Initialize an empty dictionary to hold the average results across folds
 results = dict()
 
@@ -156,8 +159,8 @@ for k in range(6):
                                                                   results_key=f'string-{tools.KEY_NOTE_OFF}'),
                                            # Continuous Pitch
                                            PitchListEvaluator(pitch_tolerances=tols),
-                                           SimpleMultiPitchRMSEEvaluator(),
-                                           SimpleMultiPitchRPAEvaluator(),
+                                           StringAgnosticRMSEEvaluator(),
+                                           StringAgnosticRPAEvaluator(),
                                            # String-Level Continuous Pitch )
                                            TablaturePitchListEvaluator(pitch_tolerances=tols,
                                                                        results_key=f'string-{tools.KEY_PITCHLIST}')])
