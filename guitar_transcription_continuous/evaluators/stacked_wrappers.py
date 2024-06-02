@@ -15,6 +15,7 @@ __all__ = [
     'PitchListEvaluator',
     'StringAgnosticRMSEEvaluator',
     'StringAgnosticRPAEvaluator',
+    'StringDependantRPAEvaluator',
     'NoteEvaluator',
     'OnsetsEvaluator',
     'OffsetsEvaluator',
@@ -210,7 +211,7 @@ class StringAgnosticRMSEEvaluator(PitchListEvaluator):
             self.count += count_tmp
             self.total += total_tmp
 
-            results[f"rmse-{dec}"] = np.sqrt((self.total / self.count))
+            results[f"sarmse-{dec}"] = np.sqrt((self.total / self.count))
         # self.results[self.get_default_key()] 
 
         # Average the tracked results
@@ -226,6 +227,10 @@ class StringAgnosticRMSEEvaluator(PitchListEvaluator):
     #     """
     #
     #     return "RMSE"
+
+
+class StringDependantRMSEEvaluator(StringAgnosticRMSEEvaluator):
+    pass
 
 
 class StringAgnosticRPAEvaluator(StringAgnosticRMSEEvaluator):
@@ -304,9 +309,68 @@ class StringAgnosticRPAEvaluator(StringAgnosticRMSEEvaluator):
             self.count += count_tmp
             self.total += total_tmp
 
-            results[f"rpa-{dec}"] = self.total / self.count
+            results[f"sarpa-{dec}"] = self.total / self.count
 
         return results
+
+
+class StringDependantRPAEvaluator(StringAgnosticRPAEvaluator):
+    def evaluate(self, estimated, reference):
+        # return only the reference times that exist in 
+        est_times = estimated[0]
+        est_pitch_list = estimated[1]
+
+        ref_times = reference[0]
+        ref_pitch_list = reference[1]
+
+        results = dict()
+
+        for dec in [4, 5, 6]:
+            # return indexes of reference for timestamps that exist in estimated
+            ref_mask = np.isin(ref_times.round(decimals=4), est_times.round(decimals=4))
+
+            # iterate over the mask to get common pitch values
+            ref_pitch_list2 = [ref_pitch_list[ind] for (ind, ), mask in np.ndenumerate(ref_mask) if mask]
+
+            # get voiced estimated and reference based on voiced reference
+            ref_mask_voiced = np.array([bool(len(pitch_list)) for pitch_list in ref_pitch_list2])
+
+            # estimated pitch list voiced according to reference
+            est_pitch_list_voiced = [est_pitch_list[ind] for (ind, ), mask in np.ndenumerate(ref_mask_voiced) if mask]
+
+            # reference pitch list voiced
+            ref_pitch_list_voiced = [ref_pitch_list2[ind] for (ind, ), mask in np.ndenumerate(ref_mask_voiced) if mask]
+
+            count_tmp = 0
+            total_tmp = 0
+
+            for est, ref in zip(est_pitch_list_voiced, ref_pitch_list_voiced):
+                # convert Hz values to cents
+                est_cents = self.frequency_to_cents(est)
+                ref_cents = self.frequency_to_cents(ref)
+
+                # iterate over every string in the ground truth and predicted
+                for ref_string, est_string in zip(ref_cents, est_cents):
+
+                    if len(est_cents) == 0:
+                        self.count += 1
+                        continue
+
+                    # calculate the cents difference between one string ref and all strings estimated
+                    difference = self.cents_diff(est_string.reshape(-1, 1), ref_string.reshape(-1, 1))
+
+                    if np.abs(difference) < self.THRESHOLD:
+                        total_tmp += 1
+
+                    count_tmp += 1
+
+            self.count += count_tmp
+            self.total += total_tmp
+
+            results[f"sdrpa-{dec}"] = self.total / self.count
+
+        return results
+
 
 
 

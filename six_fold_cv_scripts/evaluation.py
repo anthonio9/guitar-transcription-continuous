@@ -159,6 +159,7 @@ for k in range(6):
                                                                   results_key=f'string-{tools.KEY_NOTE_OFF}'),
                                            # Continuous Pitch
                                            PitchListEvaluator(pitch_tolerances=tols),
+                                           StringDependantRPAEvaluator(),
                                            StringAgnosticRMSEEvaluator(),
                                            StringAgnosticRPAEvaluator(),
                                            # String-Level Continuous Pitch )
