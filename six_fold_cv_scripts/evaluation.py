@@ -160,6 +160,7 @@ for k in range(6):
                                            # Continuous Pitch
                                            PitchListEvaluator(pitch_tolerances=tols),
                                            StringDependantRPAEvaluator(),
+                                           StringDependantRMSEEvaluator(),
                                            StringAgnosticRMSEEvaluator(),
                                            StringAgnosticRPAEvaluator(),
                                            # String-Level Continuous Pitch )
